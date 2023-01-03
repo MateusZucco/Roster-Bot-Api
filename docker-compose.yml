@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  teste-postgres-compose:
+    container_name: rosterBotDB
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "3U-s6lhefjTOfftTN0ZV9SxckHKeOR0D"
+    ports:
+      - "15432:5432"
+    
