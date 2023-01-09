@@ -1,15 +1,15 @@
-const Users = require("../models/Users");
+// const Users = require("../models/Users");
 const Rosters = require("../models/Rosters");
 const RosterItems = require("../models/RosterItems");
-// const rosterItems = require("../models/RosterItems");
-// const Sequelize = require('sequelize');
+// const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
 
 module.exports = {
     async list(req, res) {
         try {
-            const user = await Users.findOne({ where: { telegramId: req.params.userId } })
             const rosters = await Rosters.findAll({
-                where: { userId: user.id },
+                where: { userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -22,37 +22,35 @@ module.exports = {
                     ],
                 ],
             })
-            return res.status(200).json(rosters);
-
+            return res.status(201).json(rosters);
         } catch (err) {
             console.log(err)
             return res.status(400).json(err);
         }
-
     },
 
     async create(req, res) {
         let rosterData = req.body.roster
         let itensData = req.body.itens
         try {
-            let roster = await Rosters.create({ ...rosterData })
+            let roster = await Rosters.create({ ...rosterData, userId: req.user.id })
 
             itensData = itensData.text
             itensData = itensData.replace(/; /g, ";");
             itensData = itensData.replace(/ ;/g, ";");
             itensData = itensData.replace(/ ; /g, ";");
             let itensArray = itensData.split(";");
-            
+
             let position = 0
             await Promise.all(itensArray.map(async (item) => {
                 position = itensArray.findIndex(i => i == item)
                 await RosterItems.create({ text: item, icon: null, position: position + 1, rosterId: roster.dataValues.id })
             }))
 
-            await Rosters.update({ itemsNumber: position + 1 }, { where: { id: roster.id } })
+            await Rosters.update({ itemsNumber: position + 1 }, { where: { id: roster.id, userId: req.user.id } })
 
             let updatedRoster = await Rosters.findOne({
-                where: { id: roster.id },
+                where: { id: roster.id, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -80,7 +78,7 @@ module.exports = {
         let newItens = req.body
         let { rosterId } = req.params
         try {
-            let roster = await Rosters.findOne({ where: { id: rosterId }, raw: true })
+            let roster = await Rosters.findOne({ where: { id: rosterId, userId: req.user.id }, raw: true })
 
             newItens = newItens.text
             newItens = newItens.replace(/; /g, ";");
@@ -93,9 +91,9 @@ module.exports = {
                 await RosterItems.create({ text: item, icon: null, position: position + 1 + roster.itemsNumber, rosterId: rosterId })
             }))
 
-            await Rosters.update({ itemsNumber: position + 1 + roster.itemsNumber }, { where: { id: rosterId } })
+            await Rosters.update({ itemsNumber: position + 1 + roster.itemsNumber }, { where: { id: rosterId, userId: req.user.id } })
             let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -121,7 +119,7 @@ module.exports = {
         try {
             await RosterItems.update({ text: newValue }, { where: { id: itemId, rosterId: rosterId } })
             let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -145,9 +143,9 @@ module.exports = {
         let { newTitle } = req.body
         let { rosterId } = req.params
         try {
-            await Rosters.update({ title: newTitle }, { where: { id: rosterId } })
+            await Rosters.update({ title: newTitle }, { where: { id: rosterId, userId: req.user.id } })
             let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -171,9 +169,9 @@ module.exports = {
         let { newDescription } = req.body
         let { rosterId } = req.params
         try {
-            await Rosters.update({ description: newDescription }, { where: { id: rosterId } })
+            await Rosters.update({ description: newDescription }, { where: { id: rosterId, userId: req.user.id } })
             let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -195,7 +193,7 @@ module.exports = {
 
     async changePositions(req, res) {
         const { rosterId, idItemOne, idItemTwo } = req.params
-        
+
         try {
             let itemOne = await RosterItems.findOne({
                 where: { rosterId: rosterId, id: idItemOne }
@@ -210,7 +208,7 @@ module.exports = {
                 where: { rosterId: rosterId, id: idItemTwo }
             })
             let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -236,7 +234,7 @@ module.exports = {
             let selectedItem = await RosterItems.findOne({ where: { id: itemId, rosterId: rosterId } })
             await RosterItems.destroy({ where: { id: itemId, rosterId: rosterId } })
             let updatedRoster = await Rosters.findOne({
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -249,10 +247,10 @@ module.exports = {
                 }
             })
             await Rosters.update({ itemsNumber: updatedRoster.itemsNumber - 1 }, {
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
             })
             updatedRoster = await Rosters.findAll({
-                where: { id: rosterId },
+                where: { id: rosterId, userId: req.user.id },
                 include: {
                     model: RosterItems,
                     as: "rosterItems",
@@ -275,7 +273,7 @@ module.exports = {
     async delete(req, res) {
         let { rosterId } = req.params
         try {
-            await Rosters.destroy({ where: { id: rosterId } })
+            await Rosters.destroy({ where: { id: rosterId, userId: req.user.id } })
             return res.status(200).json();
         } catch (err) {
             console.log(err)
