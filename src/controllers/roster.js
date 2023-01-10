@@ -25,7 +25,7 @@ module.exports = {
             return res.status(201).json(rosters);
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -67,8 +67,7 @@ module.exports = {
             return res.status(200).json(updatedRoster);
 
         } catch (err) {
-            console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
 
     },
@@ -109,7 +108,7 @@ module.exports = {
             return res.status(200).json(updatedRoster);
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -135,7 +134,7 @@ module.exports = {
             return res.status(200).json(updatedRoster);
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -161,7 +160,7 @@ module.exports = {
             return res.status(200).json(updatedRoster);
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -186,8 +185,7 @@ module.exports = {
             })
             return res.status(200).json(updatedRoster);
         } catch (err) {
-            console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -223,8 +221,7 @@ module.exports = {
             })
             return res.status(200).json(updatedRoster);
         } catch (err) {
-            console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -266,7 +263,7 @@ module.exports = {
             return res.status(200).json(updatedRoster);
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -277,7 +274,7 @@ module.exports = {
             return res.status(200).json();
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err.toString()});
         }
     },
 }

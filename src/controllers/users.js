@@ -15,9 +15,10 @@ module.exports = {
             return res.status(201).json(user);
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error: err});
         }
     },
+
     async login(req, res) {
         try {
             const user = await Users.findOne({ where: { telegramId: req.params.telegramId } });
@@ -27,14 +28,28 @@ module.exports = {
                     token = jwt.sign({ "id": user.id, "email": user.email, "name": user.name, telegramId: user.telegramId }, process.env.JWT_SECRET);
                     res.status(200).json({ token: token });
                 } else {
-                    res.status(200).json({ error: "Password Incorrect" });
+                    res.status(401).json({ error: "Senha incorreta" });
                 }
             } else {
-                res.status(200).json({ error: "User does not exist" });
+                res.status(200).json({ error: "Usuário não encontrado. Para cadastrar seu usuário basta acessar a aba de cadastro no site: http://localhost:8080" });
             }
         } catch (err) {
             console.log(err)
-            return res.status(400).json(err);
+            return res.status(400).json({error:err});
         }
-    }
+    },
+    
+    async verifyRegister (req, res) {
+        try {
+            const user = await Users.findOne({ where: { telegramId: req.params.telegramId } });
+            if (user) {
+                res.status(200).json({ isRegistred: true})
+            } else {
+                res.status(200).json({ isRegistred: false, message: "Usuário não encontrado. Para cadastrar seu usuário basta acessar a aba de cadastro no site: http://localhost:8080" });
+            }
+        } catch (err) {
+            console.log(err)
+            return res.status(400).json({error:err});
+        }
+    },
 }
