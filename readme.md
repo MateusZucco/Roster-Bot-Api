@@ -14,6 +14,7 @@ To run this API in the development mode, you'll need to have a environment with 
 
 ### Environment variables example
 Create a .env file to save yours environment variables, like this:
+
 ```
 JWT_SECRET=my_hash,
 DATABASE=my_db_name,
