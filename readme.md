@@ -1,9 +1,10 @@
 # Roster Bot API
 
- ## Description
-  This is the back-end of the [Roster Bot](https://github.com/MateusZucco/Roster-Bot), my undergraduate thesis for [IFRS](https://ifrs.edu.br/) that I created a Telegram chatbot with the purpose of helping users when they need manage a roster.
-  
-  In this repository you will find a REST API, built with [Node.js](https://nodejs.org/en/), [Express](https://expressjs.com/), [Sequelize](https://sequelize.org/) and [PostgreSQL](https://www.postgresql.org/), with the main objective of serving list and item management routes to the [Roster-Bot](https://github.com/MateusZucco/Roster-Bot), in addition to registering users through the [Roster-Bot-Website](https://github.com/MateusZucco/Roster-Bot-Website).
+This is the back-end of the [Roster Bot](https://github.com/MateusZucco/Roster-Bot), my undergraduate thesis for [IFRS](https://ifrs.edu.br/) that I created a Telegram chatbot with the purpose of helping users when they need manage a roster.
+
+ ## About this project
+ 
+ In this repository you will find a REST API, built with [Node.js](https://nodejs.org/en/), [Express](https://expressjs.com/), [Sequelize](https://sequelize.org/) and [PostgreSQL](https://www.postgresql.org/), with the main objective of serving list and item management routes to the [Roster-Bot](https://github.com/MateusZucco/Roster-Bot), in addition to registering users through the [Roster-Bot-Website](https://github.com/MateusZucco/Roster-Bot-Website).
   
 ## Getting Started
 
