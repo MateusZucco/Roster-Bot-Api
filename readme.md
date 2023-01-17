@@ -17,9 +17,9 @@ Create a .env file to save yours environment variables, like this:
 
 ```
 JWT_SECRET="my_hash",
-DATABASE="my_db_name",
-USERNAME="my_db_username",
-PASSWORD="my_db_password",
+Db_NAME="my_db_name",
+DB_USER="my_db_username",
+DB_PASSWORD="my_db_password",
 ```
 
 ### Installing
