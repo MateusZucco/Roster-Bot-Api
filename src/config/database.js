@@ -1,7 +1,9 @@
+const dotenv = require('dotenv');
+dotenv.config();
 module.exports= {
-    database: 'rosterBotDB',
-    username: 'postgres',
-    password: '3U-s6lhefjTOfftTN0ZV9SxckHKeOR0D',
+    database: process.env.DB_NAME,
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     host: 'localhost',
     dialect: 'postgres',
     port: '15432',
