@@ -15,7 +15,7 @@ module.exports = {
             return res.status(201).json(user);
         } catch (err) {
             console.log(err)
-            return res.status(400).json({error: err});
+            return res.status(400).json({error: err.toString()});
         }
     },
 
@@ -35,7 +35,7 @@ module.exports = {
             }
         } catch (err) {
             console.log(err)
-            return res.status(400).json({error:err});
+            return res.status(400).json({error:err.toString()});
         }
     },
     
@@ -49,7 +49,7 @@ module.exports = {
             }
         } catch (err) {
             console.log(err)
-            return res.status(400).json({error:err});
+            return res.status(400).json({error:err.toString()});
         }
     },
 }

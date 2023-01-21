@@ -73,7 +73,6 @@ module.exports = {
     },
 
     async newItens(req, res) {
-        // sete; oito; novo; dez; onze
         let newItens = req.body
         let { rosterId } = req.params
         try {

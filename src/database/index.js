@@ -1,20 +1,19 @@
+const SEQUELIZE = require('sequelize')
+const DB_CONFIG = require('../config/database')
 
-const Sequelize = require('sequelize')
-const dbconfig = require('../config/database')
+const ROSTERS = require('../models/Rosters')
+const ROSTERS_ITEMS = require('../models/RosterItems')
+const USERS = require('../models/Users')
 
-const Rosters = require('../models/Rosters')
-const RosterItems = require('../models/RosterItems')
-const Users = require('../models/Users')
+const CONNECTION = new SEQUELIZE(DB_CONFIG)
 
-const connection = new Sequelize(dbconfig)
+ROSTERS.init(CONNECTION)
+ROSTERS_ITEMS.init(CONNECTION)
+USERS.init(CONNECTION)
 
-Rosters.init(connection)
-RosterItems.init(connection)
-Users.init(connection)
-
-Rosters.associate(connection.models)
-RosterItems.associate(connection.models)
-Users.associate(connection.models)
+ROSTERS.associate(CONNECTION.models)
+ROSTERS_ITEMS.associate(CONNECTION.models)
+USERS.associate(CONNECTION.models)
 
 
-module.exports = connection
+module.exports = CONNECTION
