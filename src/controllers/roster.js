@@ -1,280 +1,269 @@
-// const Users = require("../models/Users");
-const Rosters = require("../models/Rosters");
-const RosterItems = require("../models/RosterItems");
+const ROSTER = require("../models/Rosters");
+const ROSTER_ITEM = require("../models/RosterItems");
 // const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 
-module.exports = {
-    async list(req, res) {
-        try {
-            const rosters = await Rosters.findAll({
-                where: { userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-            return res.status(201).json(rosters);
-        } catch (err) {
-            console.log(err)
-            return res.status(400).json({error: err.toString()});
-        }
-    },
-
-    async create(req, res) {
-        let rosterData = req.body.roster
-        let itensData = req.body.itens
-        try {
-            let roster = await Rosters.create({ ...rosterData, userId: req.user.id })
-
-            itensData = itensData.text
-            itensData = itensData.replace(/; /g, ";");
-            itensData = itensData.replace(/ ;/g, ";");
-            itensData = itensData.replace(/ ; /g, ";");
-            let itensArray = itensData.split(";");
-
-            let position = 0
-            await Promise.all(itensArray.map(async (item) => {
-                position = itensArray.findIndex(i => i == item)
-                await RosterItems.create({ text: item, icon: null, position: position + 1, rosterId: roster.dataValues.id })
-            }))
-
-            await Rosters.update({ itemsNumber: position + 1 }, { where: { id: roster.id, userId: req.user.id } })
-
-            let updatedRoster = await Rosters.findOne({
-                where: { id: roster.id, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-
-            return res.status(200).json(updatedRoster);
-
-        } catch (err) {
-            return res.status(400).json({error: err.toString()});
-        }
-
-    },
-
-    async newItens(req, res) {
-        // sete; oito; novo; dez; onze
-        let newItens = req.body
-        let { rosterId } = req.params
-        try {
-            let roster = await Rosters.findOne({ where: { id: rosterId, userId: req.user.id }, raw: true })
-
-            newItens = newItens.text
-            newItens = newItens.replace(/; /g, ";");
-            newItens = newItens.replace(/ ;/g, ";");
-            newItens = newItens.replace(/ ; /g, ";");
-            let itensArray = newItens.split(";");
-            let position = 0
-            await Promise.all(itensArray.map(async (item) => {
-                position = itensArray.findIndex(i => i == item)
-                await RosterItems.create({ text: item, icon: null, position: position + 1 + roster.itemsNumber, rosterId: rosterId })
-            }))
-
-            await Rosters.update({ itemsNumber: position + 1 + roster.itemsNumber }, { where: { id: rosterId, userId: req.user.id } })
-            let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-            return res.status(200).json(updatedRoster);
-        } catch (err) {
-            console.log(err)
-            return res.status(400).json({error: err.toString()});
-        }
-    },
-
-    async editItem(req, res) {
-        let { newValue } = req.body
-        let { rosterId, itemId } = req.params
-        try {
-            await RosterItems.update({ text: newValue }, { where: { id: itemId, rosterId: rosterId } })
-            let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-            return res.status(200).json(updatedRoster);
-        } catch (err) {
-            console.log(err)
-            return res.status(400).json({error: err.toString()});
-        }
-    },
-
-    async editTitle(req, res) {
-        let { newTitle } = req.body
-        let { rosterId } = req.params
-        try {
-            await Rosters.update({ title: newTitle }, { where: { id: rosterId, userId: req.user.id } })
-            let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-            return res.status(200).json(updatedRoster);
-        } catch (err) {
-            console.log(err)
-            return res.status(400).json({error: err.toString()});
-        }
-    },
-
-    async editDescription(req, res) {
-        let { newDescription } = req.body
-        let { rosterId } = req.params
-        try {
-            await Rosters.update({ description: newDescription }, { where: { id: rosterId, userId: req.user.id } })
-            let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-            return res.status(200).json(updatedRoster);
-        } catch (err) {
-            return res.status(400).json({error: err.toString()});
-        }
-    },
-
-    async changePositions(req, res) {
-        const { rosterId, idItemOne, idItemTwo } = req.params
-
-        try {
-            let itemOne = await RosterItems.findOne({
-                where: { rosterId: rosterId, id: idItemOne }
-            })
-            let itemTwo = await RosterItems.findOne({
-                where: { rosterId: rosterId, id: idItemTwo }
-            })
-            await RosterItems.update({ position: itemTwo.position }, {
-                where: { rosterId: rosterId, id: idItemOne }
-            })
-            await RosterItems.update({ position: itemOne.position }, {
-                where: { rosterId: rosterId, id: idItemTwo }
-            })
-            let updatedRoster = await Rosters.findAll({
-                where: { id: rosterId, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-            return res.status(200).json(updatedRoster);
-        } catch (err) {
-            return res.status(400).json({error: err.toString()});
-        }
-    },
-
-    async deleteItem(req, res) {
-        let { rosterId, itemId } = req.params
-        try {
-            let selectedItem = await RosterItems.findOne({ where: { id: itemId, rosterId: rosterId } })
-            await RosterItems.destroy({ where: { id: itemId, rosterId: rosterId } })
-            let updatedRoster = await Rosters.findOne({
-                where: { id: rosterId, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-            })
-
-            updatedRoster.rosterItems.map(async (item) => {
-                if (item.position > selectedItem.position) {
-                    await RosterItems.update({ position: item.position - 1 }, { where: { id: item.id, rosterId: rosterId } })
-                }
-            })
-            await Rosters.update({ itemsNumber: updatedRoster.itemsNumber - 1 }, {
-                where: { id: rosterId, userId: req.user.id },
-            })
-            updatedRoster = await Rosters.findAll({
-                where: { id: rosterId, userId: req.user.id },
-                include: {
-                    model: RosterItems,
-                    as: "rosterItems",
-                },
-                order: [
-                    [
-                        { model: RosterItems, as: 'rosterItems' },
-                        'position',
-                        'ASC',
-                    ],
-                ],
-            })
-            return res.status(200).json(updatedRoster);
-        } catch (err) {
-            console.log(err)
-            return res.status(400).json({error: err.toString()});
-        }
-    },
-
-    async delete(req, res) {
-        let { rosterId } = req.params
-        try {
-            await Rosters.destroy({ where: { id: rosterId, userId: req.user.id } })
-            return res.status(200).json();
-        } catch (err) {
-            console.log(err)
-            return res.status(400).json({error: err.toString()});
-        }
-    },
+function splitNewItems(items) {
+  let itensData;
+  itensData = items.text;
+  itensData = itensData.replace(/; /g, ";");
+  itensData = itensData.replace(/ ;/g, ";");
+  itensData = itensData.replace(/ ; /g, ";");
+  return itensData.split(";");
 }
+
+async function newRosterItems(
+  rosterItemsArray,
+  rosterData,
+  userId,
+  position = 0
+) {
+  await Promise.all(
+    rosterItemsArray.map(async (item) => {
+      position = rosterItemsArray.findIndex((i) => i == item);
+      await ROSTER_ITEM.create({
+        text: item,
+        icon: null,
+        position: rosterData.itemsNumber  + position + 1,
+        rosterId: rosterData.id,
+      });
+    })
+  );
+  await ROSTER.update(
+    { itemsNumber: position + 1 + rosterData.itemsNumber },
+    { where: { id: rosterData.id, userId: userId } }
+  );
+}
+
+async function getUpdatedRoster(rosterId, userId) {
+  try {
+    const UPDATED_ROSTER = await ROSTER.findOne({
+      where: { id: rosterId, userId: userId },
+      include: {
+        model: ROSTER_ITEM,
+        as: "rosterItems",
+      },
+      order: [[{ model: ROSTER_ITEM, as: "rosterItems" }, "position", "ASC"]],
+    });
+    return UPDATED_ROSTER;
+  } catch (err) {
+    throw err;
+  }
+}
+
+module.exports = {
+  async list(req, res) {
+    try {
+      const { id: USER_ID } = req.user;
+
+      const ROSTERS = await ROSTER.findAll({
+        where: { userId: USER_ID },
+        include: {
+          model: ROSTER_ITEM,
+          as: "rosterItems",
+        },
+        order: [[{ model: ROSTER_ITEM, as: "rosterItems" }, "position", "ASC"]],
+      });
+      return res.status(201).json(ROSTERS);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async create(req, res) {
+    try {
+      const REQUEST_DATA = req.body.roster;
+      const { id: USER_ID } = req.user;
+
+      const ROSTER_DATA = await ROSTER.create({
+        ...REQUEST_DATA,
+        userId: USER_ID,
+      });
+
+      let itensArray = splitNewItems(req.body.itens);
+
+      await newRosterItems(itensArray, ROSTER_DATA, USER_ID);
+
+      const UPDATED_ROSTER = await getUpdatedRoster(ROSTER_DATA.id, USER_ID);
+
+      console.log(UPDATED_ROSTER);
+      return res.status(200).json(UPDATED_ROSTER);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async newItens(req, res) {
+    try {
+      const { ROSTER_ID } = req.params;
+      const { id: USER_ID } = req.user;
+
+      const ROSTER_DATA = await ROSTER.findOne({
+        where: { id: ROSTER_ID, userId: USER_ID },
+        raw: true,
+      });
+
+      let itensArray = splitNewItems(req.body);
+
+      await newRosterItems(itensArray, ROSTER_DATA, USER_ID);
+
+      const UPDATED_ROSTER = await getUpdatedRoster(ROSTER_ID, USER_ID);
+
+      return res.status(201).json(UPDATED_ROSTER);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async editItem(req, res) {
+    try {
+      const { id: USER_ID } = req.user;
+      const { newValue: NEW_VALUE } = req.body;
+      const { ROSTER_ID, ITEM_ID } = req.params;
+
+      await ROSTER_ITEM.update(
+        { text: NEW_VALUE },
+        { where: { id: ITEM_ID, rosterId: ROSTER_ID } }
+      );
+
+      const UPDATED_ROSTER = await getUpdatedRoster(ROSTER_ID, USER_ID);
+
+      return res.status(200).json(UPDATED_ROSTER);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async editTitle(req, res) {
+    try {
+      const { id: USER_ID } = req.user;
+      const { newTitle: NEW_TITLE } = req.body;
+      const { ROSTER_ID } = req.params;
+
+      await ROSTER.update(
+        { title: NEW_TITLE },
+        { where: { id: ROSTER_ID, userId: USER_ID } }
+      );
+
+      const UPDATED_ROSTER = await getUpdatedRoster(ROSTER_ID, USER_ID);
+
+      return res.status(200).json(UPDATED_ROSTER);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async editDescription(req, res) {
+    try {
+      const { id: USER_ID } = req.user;
+      const { newDescription: NEW_DESCRIPTION } = req.body;
+      const { ROSTER_ID } = req.params;
+
+      await ROSTER.update(
+        { description: NEW_DESCRIPTION },
+        { where: { id: ROSTER_ID, userId: USER_ID } }
+      );
+
+      const UPDATED_ROSTER = await getUpdatedRoster(ROSTER_ID, USER_ID);
+
+      return res.status(200).json(UPDATED_ROSTER);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async changePositions(req, res) {
+    try {
+      const { ROSTER_ID, ITEM_TWO_ID, ITEM_ONE_ID } = req.params;
+      const { id: USER_ID } = req.user;
+
+      const ITEM_ONE = await ROSTER_ITEM.findOne({
+        where: { rosterId: ROSTER_ID, id: ITEM_ONE_ID },
+      });
+      const ITEM_TWO = await ROSTER_ITEM.findOne({
+        where: { rosterId: ROSTER_ID, id: ITEM_TWO_ID },
+      });
+
+      await ROSTER_ITEM.update(
+        { position: ITEM_TWO.position },
+        {
+          where: { rosterId: ROSTER_ID, id: ITEM_ONE_ID },
+        }
+      );
+      await ROSTER_ITEM.update(
+        { position: ITEM_ONE.position },
+        {
+          where: { rosterId: ROSTER_ID, id: ITEM_TWO_ID },
+        }
+      );
+
+      const UPDATED_ROSTER = await getUpdatedRoster(ROSTER_ID, USER_ID);
+
+      return res.status(200).json(UPDATED_ROSTER);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async deleteItem(req, res) {
+    try {
+      const { ROSTER_ID, ITEM_ID } = req.params;
+      const { id: USER_ID } = req.user;
+
+      const ITEM_TO_DESTROY = await ROSTER_ITEM.findOne({
+        where: { id: ITEM_ID, rosterId: ROSTER_ID },
+      });
+
+      await ROSTER_ITEM.destroy({
+        where: { id: ITEM_ID, rosterId: ROSTER_ID },
+      });
+
+      let rosterToRemoveItem = await getUpdatedRoster(ROSTER_ID, USER_ID);
+
+      rosterToRemoveItem.rosterItems.map(async (item) => {
+        if (item.position > ITEM_TO_DESTROY.position) {
+          await ROSTER_ITEM.update(
+            { position: item.position - 1 },
+            { where: { id: item.id, rosterId: ROSTER_ID } }
+          );
+        }
+      });
+
+      await ROSTER.update(
+        { itemsNumber: rosterToRemoveItem.itemsNumber - 1 },
+        {
+          where: { id: ROSTER_ID, userId: USER_ID },
+        }
+      );
+
+      const UPDATED_ROSTER = await getUpdatedRoster(ROSTER_ID, USER_ID);
+
+      return res.status(200).json(UPDATED_ROSTER);
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+
+  async delete(req, res) {
+    try {
+      const { ROSTER_ID } = req.params;
+      const { id: USER_ID } = req.user;
+
+      await ROSTER.destroy({ where: { id: ROSTER_ID, userId: USER_ID } });
+
+      return res.status(200).json();
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json({ error: err.toString() });
+    }
+  },
+};

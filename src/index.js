@@ -1,17 +1,15 @@
-const express = require('express')
-const routesRosters = require('./routes/rosters')
-const routesUser = require('./routes/users')
-const app = express()
-const cors = require('cors')
+const EXPRESS = require("express");
+const ROUTES_ROSTER = require("./routes/rosters");
+const ROUTES_USER = require("./routes/users");
+const APP = EXPRESS();
+const CORS = require("cors");
 
-require('./database')
+require("./database");
 
-app.use(express.json())
-app.use(cors())
-// res.header("Access-Control-Allow-Origin" , "*")
-// next()
+APP.use(EXPRESS.json());
+APP.use(CORS());
 
-app.set('http://192.168.1.7')
-app.use(routesRosters)
-app.use(routesUser)
-app.listen(3030)
+APP.set("http://localhost");
+APP.use(ROUTES_ROSTER);
+APP.use(ROUTES_USER);
+APP.listen(3030);

@@ -1,9 +1,12 @@
-const express = require('express')
+const EXPRESS = require("express");
 
-const routes = express.Router()
+const ROUTES = EXPRESS.Router();
 
-const Controller = require('../controllers/users')
-routes.post('/new-user', Controller.create)
-routes.post('/:telegramId/login', Controller.login)
-routes.get('/:telegramId/verify-register', Controller.verifyRegister)
-module.exports = routes;
+const CONTROLLER = require("../controllers/users");
+
+ROUTES.post("/new-user", CONTROLLER.create);
+ROUTES.post("/:telegramId/login", CONTROLLER.login);
+
+ROUTES.get("/:telegramId/verify-register", CONTROLLER.verifyRegister);
+
+module.exports = ROUTES;
