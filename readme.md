@@ -17,9 +17,12 @@ Create a .env file to save yours environment variables, like this:
 
 ```
 JWT_SECRET="my_hash",
-Db_NAME="my_db_name",
+DB_NAME="my_db_name",
 DB_USER="my_db_username",
 DB_PASSWORD="my_db_password",
+DB_HOST="locahost",
+DB_DIALECT="postgres",
+DB_PORT="15432",
 ```
 
 ### Installing
