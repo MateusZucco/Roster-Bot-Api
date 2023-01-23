@@ -1,22 +1,22 @@
-const express = require('express')
+const EXPRESS = require('express')
 
-const routes = express.Router()
+const ROUTES = EXPRESS.Router()
 
 const verifyToken = require('../middlewares/verifyToken')
 const Controller = require('../controllers/roster')
 
 
-routes.get('/list-rosters', verifyToken, Controller.list)
+ROUTES.get('/list-rosters', verifyToken, Controller.list)
 
-routes.post('/roster',verifyToken, Controller.create)
-routes.post('/roster/:rosterId/new-item', verifyToken, Controller.newItens)
+ROUTES.post('/roster',verifyToken, Controller.create)
+ROUTES.post('/roster/:ROSTER_ID/new-item', verifyToken, Controller.newItens)
 
-routes.put('/roster/:rosterId/item/:itemId', verifyToken, Controller.editItem)
-routes.put('/roster/:rosterId/title', verifyToken, Controller.editTitle)
-routes.put('/roster/:rosterId/description', verifyToken, Controller.editDescription)
-routes.put('/roster/:rosterId/change-positions-items/:idItemOne/:idItemTwo', verifyToken, Controller.changePositions)
+ROUTES.put('/roster/:ROSTER_ID/item/:ITEM_ID', verifyToken, Controller.editItem)
+ROUTES.put('/roster/:ROSTER_ID/title', verifyToken, Controller.editTitle)
+ROUTES.put('/roster/:ROSTER_ID/description', verifyToken, Controller.editDescription)
+ROUTES.put('/roster/:ROSTER_ID/change-positions-items/:ITEM_ONE_ID/:ITEM_TWO_ID', verifyToken, Controller.changePositions)
 
-routes.delete('/roster/:rosterId', verifyToken, Controller.delete)
-routes.delete('/roster/:rosterId/item/:itemId', verifyToken, Controller.deleteItem)
+ROUTES.delete('/roster/:ROSTER_ID', verifyToken, Controller.delete)
+ROUTES.delete('/roster/:ROSTER_ID/item/:ITEM_ID', verifyToken, Controller.deleteItem)
 
-module.exports = routes;
+module.exports = ROUTES;
