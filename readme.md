@@ -20,7 +20,7 @@ JWT_SECRET="my_hash",
 DB_NAME="my_db_name",
 DB_USER="my_db_username",
 DB_PASSWORD="my_db_password",
-DB_HOST="locahost",
+DB_HOST="localhost",
 DB_DIALECT="postgres",
 DB_PORT="15432",
 ```
